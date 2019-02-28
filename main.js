@@ -17,7 +17,7 @@ UnionFind.prototype.find = function(index) {
 };
 
 UnionFind.prototype.count = function(type) {
-  // return number of components in array
+  // return number of components
 };
 
 UnionFind.prototype.union = function(type, child, parent) {
