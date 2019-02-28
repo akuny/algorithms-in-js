@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Union Find</title>
+    <style>
+      .hidden {
+        visibility: hidden;
+      }
+      .visible {
+        visibility: visible;
+      }
+    </style>
+  </head>
+  <div id="firstForm">
+    <form id="selectionForm">
+      <select id="selection">
+        <option value="quickFind">Quick Find</option>
+        <option value="quickUnion">Quick Union</option>
+        <option value="weightedQuickUnion">Weighted Quick Union</option>
+      </select>
+      <button type="submit">Select Union Find Algorithm</button>
+    </form>
+  </div>
+  <br />
+  <div id="secondForm" class="hidden">
+    <form id="unionForm">
+      <input type="text" id="child" />
+      <input type="text" id="parent" />
+      <button type="submit">Union</button>
+    </form>
+  </div>
+  <br />
+  <div id="screen"></div>
+  <body>
+    <script src="main.js"></script>
+  </body>
+</html>
