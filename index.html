@@ -3,11 +3,18 @@
   <head>
     <title>Union Find</title>
     <style>
+      body {
+        font-family: 'Courier New', Courier, monospace;
+      }
       .hidden {
         visibility: hidden;
       }
       .visible {
         visibility: visible;
+      }
+      #error {
+        color: red;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -26,14 +33,22 @@
     <div id="secondForm" class="hidden">
       <form id="unionForm">
         <label>Make:</label>
-        <input type="text" id="child" />
+        <input type="text" id="child" size="1" />
         <label>the child of:</label>
-        <input type="text" id="parent" />
+        <input type="text" id="parent" size="1" />
         <button type="submit">Union</button>
       </form>
     </div>
     <br />
-    <div id="screen"></div>
+    <div id="screen">
+      <div id="node"></div>
+      <br />
+      <div id="parentId"></div>
+      <br />
+      <div id="count"></div>
+      <br />
+      <div id="error"></div>
+    </div>
     <script src="./main.js"></script>
   </body>
 </html>

@@ -1,12 +1,13 @@
 // define UnionFind algorithm object
 var UnionFind = function(type) {
   this.length = 10;
-  this.count = this.length;
+  this.componentCount = this.length;
   this.parentIdStore = [];
   this.size = [];
   this.type = type;
   this.populateParentIdStore(this.parentIdStore, this.length);
   this.populateParentIdStore(this.size, this.length);
+  this.count();
 };
 
 UnionFind.prototype.populateParentIdStore = function(array, n) {
@@ -18,13 +19,7 @@ UnionFind.prototype.populateParentIdStore = function(array, n) {
 UnionFind.prototype.find = function(index) {
   if (this.type === 'quickFind') {
     return this.parentIdStore[index];
-  } else if (this.type === 'quickUnion') {
-    while (index !== this.parentIdStore[index]) {
-      index = this.parentIdStore[index];
-    }
-    return index;
-  } else if (this.type === 'weightedQuickUnion') {
-    // weighted quick union implementation
+  } else if (this.type === 'quickUnion' || this.type === 'weightedQuickUnion') {
     while (index !== this.parentIdStore[index]) {
       index = this.parentIdStore[index];
     }
@@ -34,9 +29,12 @@ UnionFind.prototype.find = function(index) {
   }
 };
 
-UnionFind.prototype.count = function(type) {
+UnionFind.prototype.count = function() {
   // return number of components
-  return this.count;
+  var self = this;
+  var countScreen = document.getElementById('count');
+  countScreen.innerHTML =
+    'There are ' + self.componentCount + ' discrete components.';
 };
 
 UnionFind.prototype.union = function(child, parent) {
@@ -50,14 +48,14 @@ UnionFind.prototype.union = function(child, parent) {
         this.parentIdStore[i] = parent;
       }
     }
-    this.count--;
+    this.componentCount--;
   } else if (this.type === 'quickUnion') {
     // quick union implementation
     var childRoot = this.find(child);
     var parentRoot = this.find(parent);
     if (childRoot === parentRoot) return;
     this.parentIdStore[childRoot] = parentRoot;
-    this.count--;
+    this.componentCount--;
   } else if (this.type === 'weightedQuickUnion') {
     // weighted quick union implementation
     var childRoot = this.find(child);
@@ -73,7 +71,7 @@ UnionFind.prototype.union = function(child, parent) {
   } else {
     console.error('error');
   }
-  console.log(this.parentIdStore);
+  this.count();
 };
 
 UnionFind.prototype.connected = function(type, indexA, indexB) {
@@ -86,8 +84,8 @@ var App = function() {
   this.unionForm = document.getElementById('unionForm');
   this.screen = document.getElementById('screen');
   this.currentAlgorithm = null;
-
   var self = this;
+
   this.selectionForm.addEventListener('submit', function(event) {
     var userSelection = document.getElementById('selection').value;
     self.selectAlgorithm(userSelection);
@@ -97,7 +95,19 @@ var App = function() {
   this.unionForm.addEventListener('submit', function(event) {
     var child = document.getElementById('child');
     var parent = document.getElementById('parent');
+    var errorScreen = document.getElementById('error');
+    errorScreen.innerHTML = '';
+    var validC = self.validate(parseInt(child.value, 10));
+    var validP = self.validate(parseInt(parent.value, 10));
+    if (!validC || !validP) {
+      errorScreen.innerHTML = 'Numbers from 0 to 9 only, please';
+      self.drawScreen(self.currentAlgorithm);
+      child.value = '';
+      parent.value = '';
+      event.preventDefault();
+    }
     self.currentAlgorithm.union(child.value, parent.value);
+    self.drawScreen(self.currentAlgorithm);
     child.value = '';
     parent.value = '';
     event.preventDefault();
@@ -113,7 +123,24 @@ App.prototype.selectAlgorithm = function(selection) {
 };
 
 App.prototype.drawScreen = function(algObj) {
-  // use algObg properties to render table
+  var nodeScreen = document.getElementById('node');
+  var parentIdScreen = document.getElementById('parentId');
+  var indexes = function(array) {
+    var arrayOfIndexes = [];
+    for (var i = 0; i < array.length; i++) {
+      arrayOfIndexes.push(i);
+    }
+    return arrayOfIndexes;
+  };
+  nodeScreen.innerHTML = 'node: ' + indexes(algObj.parentIdStore);
+  parentIdScreen.innerHTML = 'parent id: ' + algObj.parentIdStore;
+};
+
+App.prototype.validate = function(input) {
+  if (typeof input !== 'number') return false;
+  if (isNaN(input)) return false;
+  if (input > 9) return false;
+  return true;
 };
 
 // make a new App object
