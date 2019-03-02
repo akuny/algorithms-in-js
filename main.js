@@ -1,3 +1,5 @@
+'use strict';
+
 // define UnionFind algorithm object
 var UnionFind = function(type) {
   this.length = 10;
@@ -31,10 +33,7 @@ UnionFind.prototype.find = function(index) {
 
 UnionFind.prototype.count = function() {
   // return number of components
-  var self = this;
-  var countScreen = document.getElementById('count');
-  countScreen.innerHTML =
-    'There are ' + self.componentCount + ' discrete components.';
+  return 'There are ' + this.componentCount + ' discrete components.';
 };
 
 UnionFind.prototype.union = function(child, parent) {
@@ -79,11 +78,12 @@ UnionFind.prototype.connected = function(type, indexA, indexB) {
 };
 
 // define App object
-var App = function() {
+var App = function(screen) {
   this.selectionForm = document.getElementById('selectionForm');
   this.unionForm = document.getElementById('unionForm');
-  this.screen = document.getElementById('screen');
+  this.screen = screen;
   this.currentAlgorithm = null;
+
   var self = this;
 
   this.selectionForm.addEventListener('submit', function(event) {
@@ -95,19 +95,17 @@ var App = function() {
   this.unionForm.addEventListener('submit', function(event) {
     var child = document.getElementById('child');
     var parent = document.getElementById('parent');
-    var errorScreen = document.getElementById('error');
-    errorScreen.innerHTML = '';
     var validC = self.validate(parseInt(child.value, 10));
     var validP = self.validate(parseInt(parent.value, 10));
     if (!validC || !validP) {
-      errorScreen.innerHTML = 'Numbers from 0 to 9 only, please';
-      self.drawScreen(self.currentAlgorithm);
+      self.screen.showError('Numbers from 0 to 9 only, please');
+      self.screen.refresh(self.currentAlgorithm);
       child.value = '';
       parent.value = '';
       event.preventDefault();
     }
     self.currentAlgorithm.union(child.value, parent.value);
-    self.drawScreen(self.currentAlgorithm);
+    self.screen.refresh(self.currentAlgorithm);
     child.value = '';
     parent.value = '';
     event.preventDefault();
@@ -117,23 +115,13 @@ var App = function() {
 App.prototype.selectAlgorithm = function(selection) {
   var unionForm = document.getElementById('secondForm');
   this.currentAlgorithm = new UnionFind(selection);
-  this.drawScreen(this.currentAlgorithm);
+  this.screen.refresh(this.currentAlgorithm);
   unionForm.classList.add('visible');
   unionForm.classList.remove('hidden');
 };
 
-App.prototype.drawScreen = function(algObj) {
-  var nodeScreen = document.getElementById('node');
-  var parentIdScreen = document.getElementById('parentId');
-  var indexes = function(array) {
-    var arrayOfIndexes = [];
-    for (var i = 0; i < array.length; i++) {
-      arrayOfIndexes.push(i);
-    }
-    return arrayOfIndexes;
-  };
-  nodeScreen.innerHTML = 'node: ' + indexes(algObj.parentIdStore);
-  parentIdScreen.innerHTML = 'parent id: ' + algObj.parentIdStore;
+App.prototype.turnOn = function() {
+  this.Screen.refresh();
 };
 
 App.prototype.validate = function(input) {
@@ -143,5 +131,37 @@ App.prototype.validate = function(input) {
   return true;
 };
 
+// define screen object
+var Screen = function() {
+  this.nodeScreen = document.getElementById('node');
+  this.parentIdScreen = document.getElementById('parentId');
+  this.countScreen = document.getElementById('count');
+  this.errorScreen = document.getElementById('error');
+};
+
+Screen.prototype.refresh = function(algObj) {
+  /*
+   * TODO conditionally display error message
+   */
+
+  var indexes = function(array) {
+    var arrayOfIndexes = [];
+    for (var i = 0; i < array.length; i++) {
+      arrayOfIndexes.push(i);
+    }
+    return arrayOfIndexes;
+  };
+  this.countScreen.innerHTML = algObj.count();
+  this.nodeScreen.innerHTML = 'node: ' + indexes(algObj.parentIdStore);
+  this.parentIdScreen.innerHTML = 'parent id: ' + algObj.parentIdStore;
+};
+
+Screen.prototype.showError = function() {
+  this.errorScreen.innerHTML = 'Numbers from 0 to 9 only, please';
+};
+
 // make a new App object
-var app = new App();
+(function() {
+  var screen = new Screen();
+  var app = new App(screen);
+})();
